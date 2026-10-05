@@ -1,0 +1,271 @@
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+FLASH            0x08000000         0x00080000         rw
+SRAM             0x20000000         0x00020000         xrw
+*default*        0x00000000         0xffffffff
+
+Linker script and memory map
+
+LOAD C:/arm-gnu-toolchain-15.3.rel1-mingw-w64-i686-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.3.1/../../../../arm-none-eabi/lib\libc_nano.a
+LOAD C:/arm-gnu-toolchain-15.3.rel1-mingw-w64-i686-arm-none-eabi/bin/../lib/gcc/arm-none-eabi/15.3.1/../../../../arm-none-eabi/lib\libm.a
+LOAD GPIO.o
+LOAD gyro.o
+LOAD main.o
+LOAD SPI.o
+LOAD stm32f411_startup.o
+LOAD uart.o
+                0x20020000                        _estack = (ORIGIN (SRAM) + LENGTH (SRAM))
+                0x00000200                        __max_heap_size = 0x200
+                0x00000400                        __max_stack_size = 0x400
+
+.text           0x08000000      0xa9c
+                0x08000000                        . = ALIGN (0x4)
+ *(.isr_vector_tbl)
+ .isr_vector_tbl
+                0x08000000      0x124 stm32f411_startup.o
+                0x08000000                vector_tbl
+ *(.text)
+ .text          0x08000124       0x70 GPIO.o
+                0x08000124                led_init
+                0x0800015c                led_on
+                0x08000178                led_off
+ .text          0x08000194      0x14c gyro.o
+                0x08000194                i3g4250d_read_reg
+                0x080001c8                i3g4250d_write_reg
+                0x080001fe                i3g4250d_init
+                0x08000258                i3g4250d_read_xyz
+ .text          0x080002e0       0x5c main.o
+                0x080002e0                main
+ .text          0x0800033c      0x354 SPI.o
+                0x0800033c                spi_gpio_init
+                0x08000488                spi1_config
+                0x08000540                spi1_transfer
+                0x08000588                spi1_transmit
+                0x08000600                spi1_receive
+                0x08000658                cs_enable
+                0x08000674                cs_disable
+ .text          0x08000690       0x98 stm32f411_startup.o
+                0x08000690                RTC_Alarm_IRQHandler
+                0x08000690                EXTI2_IRQHandler
+                0x08000690                DebugMon_Handler
+                0x08000690                SPI4_IRQHandler
+                0x08000690                TIM1_CC_IRQHandler
+                0x08000690                DMA2_Stream5_IRQHandler
+                0x08000690                HardFault_Handler
+                0x08000690                DMA1_Stream5_IRQHandler
+                0x08000690                SysTick_Handler
+                0x08000690                PVD_IRQHandler
+                0x08000690                SDIO_IRQHandler
+                0x08000690                TAMP_STAMP_IRQHandler
+                0x08000690                PendSV_Handler
+                0x08000690                NMI_Handler
+                0x08000690                EXTI3_IRQHandler
+                0x08000690                TIM1_UP_TIM10_IRQHandler
+                0x08000690                I2C3_ER_IRQHandler
+                0x08000690                EXTI0_IRQHandler
+                0x08000690                I2C2_EV_IRQHandler
+                0x08000690                DMA1_Stream2_IRQHandler
+                0x08000690                FPU_IRQHandler
+                0x08000690                UsageFault_Handler
+                0x08000690                DMA2_Stream2_IRQHandler
+                0x08000690                SPI1_IRQHandler
+                0x08000690                TIM1_BRK_TIM9_IRQHandler
+                0x08000690                DMA2_Stream3_IRQHandler
+                0x08000690                USART6_IRQHandler
+                0x08000690                DMA2_Stream6_IRQHandler
+                0x08000690                DMA2_Stream0_IRQHandler
+                0x08000690                TIM4_IRQHandler
+                0x08000690                I2C1_EV_IRQHandler
+                0x08000690                DMA1_Stream6_IRQHandler
+                0x08000690                DMA1_Stream1_IRQHandler
+                0x08000690                TIM3_IRQHandler
+                0x08000690                RCC_IRQHandler
+                0x08000690                Default_Handler
+                0x08000690                EXTI15_10_IRQHandler
+                0x08000690                ADC_IRQHandler
+                0x08000690                DMA1_Stream7_IRQHandler
+                0x08000690                SPI5_IRQHandler
+                0x08000690                TIM5_IRQHandler
+                0x08000690                DMA2_Stream7_IRQHandler
+                0x08000690                I2C3_EV_IRQHandler
+                0x08000690                EXTI9_5_IRQHandler
+                0x08000690                RTC_WKUP_IRQHandler
+                0x08000690                SPI2_IRQHandler
+                0x08000690                MemManage_Handler
+                0x08000690                DMA1_Stream0_IRQHandler
+                0x08000690                SVC_Handler
+                0x08000690                EXTI4_IRQHandler
+                0x08000690                WWDG_IRQHandler
+                0x08000690                TIM2_IRQHandler
+                0x08000690                OTG_FS_WKUP_IRQHandler
+                0x08000690                TIM1_TRG_COM_TIM11_IRQHandler
+                0x08000690                EXTI1_IRQHandler
+                0x08000690                USART2_IRQHandler
+                0x08000690                I2C2_ER_IRQHandler
+                0x08000690                DMA2_Stream1_IRQHandler
+                0x08000690                FLASH_IRQHandler
+                0x08000690                DMA2_Stream4_IRQHandler
+                0x08000690                BusFault_Handler
+                0x08000690                USART1_IRQHandler
+                0x08000690                OTG_FS_IRQHandler
+                0x08000690                SPI3_IRQHandler
+                0x08000690                DMA1_Stream4_IRQHandler
+                0x08000690                I2C1_ER_IRQHandler
+                0x08000690                DMA1_Stream3_IRQHandler
+                0x08000696                Reset_Handler
+ .text          0x08000728      0x298 uart.o
+                0x08000728                uart_init
+                0x080007bc                uart_write
+                0x080007fc                uart_write_char
+                0x080008c0                uart_print
+ *(.rodata)
+ .rodata        0x080009c0       0x83 gyro.o
+ *fill*         0x08000a43        0x1 
+ .rodata        0x08000a44       0x15 main.o
+ *fill*         0x08000a59        0x3 
+ .rodata        0x08000a5c       0x3f SPI.o
+                0x08000a9c                        . = ALIGN (0x4)
+ *fill*         0x08000a9b        0x1 
+                0x08000a9c                        _etext = .
+
+.glue_7         0x08000a9c        0x0
+ .glue_7        0x08000a9c        0x0 linker stubs
+
+.glue_7t        0x08000a9c        0x0
+ .glue_7t       0x08000a9c        0x0 linker stubs
+
+.vfp11_veneer   0x08000a9c        0x0
+ .vfp11_veneer  0x08000a9c        0x0 linker stubs
+
+.v4_bx          0x08000a9c        0x0
+ .v4_bx         0x08000a9c        0x0 linker stubs
+
+.iplt           0x08000a9c        0x0
+ .iplt          0x08000a9c        0x0 gyro.o
+
+.rel.dyn        0x08000a9c        0x0
+ .rel.iplt      0x08000a9c        0x0 gyro.o
+
+.data           0x20000000        0x0 load address 0x08000a9c
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sdata = .
+ *(.data)
+ .data          0x20000000        0x0 GPIO.o
+ .data          0x20000000        0x0 gyro.o
+ .data          0x20000000        0x0 main.o
+ .data          0x20000000        0x0 SPI.o
+ .data          0x20000000        0x0 stm32f411_startup.o
+ .data          0x20000000        0x0 uart.o
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _edata = .
+
+.igot.plt       0x20000000        0x0 load address 0x08000a9c
+ .igot.plt      0x20000000        0x0 gyro.o
+
+.bss            0x20000000        0x0 load address 0x08000a9c
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _sbss = .
+ *(.bss)
+ .bss           0x20000000        0x0 GPIO.o
+ .bss           0x20000000        0x0 gyro.o
+ .bss           0x20000000        0x0 main.o
+ .bss           0x20000000        0x0 SPI.o
+ .bss           0x20000000        0x0 stm32f411_startup.o
+ .bss           0x20000000        0x0 uart.o
+                0x20000000                        . = ALIGN (0x4)
+                0x20000000                        _ebss = .
+OUTPUT(Bare_Metal_Program.elf elf32-littlearm)
+LOAD linker stubs
+
+.debug_info     0x00000000     0x10a1
+ .debug_info    0x00000000      0x2b8 GPIO.o
+ .debug_info    0x000002b8      0x1ee gyro.o
+ .debug_info    0x000004a6      0x152 main.o
+ .debug_info    0x000005f8      0x430 SPI.o
+ .debug_info    0x00000a28      0x184 stm32f411_startup.o
+ .debug_info    0x00000bac      0x4f5 uart.o
+
+.debug_abbrev   0x00000000      0x6a3
+ .debug_abbrev  0x00000000       0xa4 GPIO.o
+ .debug_abbrev  0x000000a4      0x133 gyro.o
+ .debug_abbrev  0x000001d7       0xbd main.o
+ .debug_abbrev  0x00000294      0x16d SPI.o
+ .debug_abbrev  0x00000401       0xfe stm32f411_startup.o
+ .debug_abbrev  0x000004ff      0x1a4 uart.o
+
+.debug_aranges  0x00000000       0xc0
+ .debug_aranges
+                0x00000000       0x20 GPIO.o
+ .debug_aranges
+                0x00000020       0x20 gyro.o
+ .debug_aranges
+                0x00000040       0x20 main.o
+ .debug_aranges
+                0x00000060       0x20 SPI.o
+ .debug_aranges
+                0x00000080       0x20 stm32f411_startup.o
+ .debug_aranges
+                0x000000a0       0x20 uart.o
+
+.debug_line     0x00000000      0xbaa
+ .debug_line    0x00000000      0x141 GPIO.o
+ .debug_line    0x00000141      0x1ac gyro.o
+ .debug_line    0x000002ed      0x147 main.o
+ .debug_line    0x00000434      0x32f SPI.o
+ .debug_line    0x00000763      0x17c stm32f411_startup.o
+ .debug_line    0x000008df      0x2cb uart.o
+
+.debug_str      0x00000000      0x4b5
+ .debug_str     0x00000000      0x4b5 GPIO.o
+                                0x27c (size before relaxing)
+ .debug_str     0x000004b5        0x0 gyro.o
+                                0x1e2 (size before relaxing)
+ .debug_str     0x000004b5        0x0 main.o
+                                0x19f (size before relaxing)
+ .debug_str     0x000004b5        0x0 SPI.o
+                                0x323 (size before relaxing)
+ .debug_str     0x000004b5        0x0 stm32f411_startup.o
+                                0x1c8 (size before relaxing)
+ .debug_str     0x000004b5        0x0 uart.o
+                                0x362 (size before relaxing)
+
+.comment        0x00000000       0x46
+ .comment       0x00000000       0x46 GPIO.o
+                                 0x47 (size before relaxing)
+ .comment       0x00000046        0x0 gyro.o
+                                 0x47 (size before relaxing)
+ .comment       0x00000046        0x0 main.o
+                                 0x47 (size before relaxing)
+ .comment       0x00000046        0x0 SPI.o
+                                 0x47 (size before relaxing)
+ .comment       0x00000046        0x0 stm32f411_startup.o
+                                 0x47 (size before relaxing)
+ .comment       0x00000046        0x0 uart.o
+                                 0x47 (size before relaxing)
+
+.ARM.attributes
+                0x00000000       0x2e
+ .ARM.attributes
+                0x00000000       0x2e GPIO.o
+ .ARM.attributes
+                0x0000002e       0x2e gyro.o
+ .ARM.attributes
+                0x0000005c       0x2e main.o
+ .ARM.attributes
+                0x0000008a       0x2e SPI.o
+ .ARM.attributes
+                0x000000b8       0x2e stm32f411_startup.o
+ .ARM.attributes
+                0x000000e6       0x2e uart.o
+
+.debug_frame    0x00000000      0x3b4
+ .debug_frame   0x00000000       0x70 GPIO.o
+ .debug_frame   0x00000070       0xa4 gyro.o
+ .debug_frame   0x00000114       0x30 main.o
+ .debug_frame   0x00000144       0xfc SPI.o
+ .debug_frame   0x00000240       0x4c stm32f411_startup.o
+ .debug_frame   0x0000028c      0x128 uart.o

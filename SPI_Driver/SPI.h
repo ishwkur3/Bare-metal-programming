@@ -7,10 +7,13 @@
 void spi_gpio_init(void);
 void spi1_config(void);
 
-// Replace spi1_transmit and spi1_receive with this unified function:
-void spi1_transfer(uint8_t *tx_data, uint8_t *rx_data, uint32_t size);
+void spi1_transmit(uint8_t *data, uint32_t size);
+void spi1_receive(uint8_t *data, uint32_t size);
+
+uint8_t spi1_transfer(uint8_t data);
 
 void cs_enable(void);
 void cs_disable(void);
+
 
 #endif

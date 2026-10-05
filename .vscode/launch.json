@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cortex Debug (OpenOCD)",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}\\SPI_Driver\\Bare_Metal_Program.elf", // Path to your compiled bare-metal .elf file
+            "request": "launch",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main", // Automatically stops at the beginning of main()
+            "servertype": "openocd",
+            "device": "STM32F411VE",
+            "configFiles": [
+                "interface/stlink.cfg",
+                "target/stm32f4x.cfg"
+            ],
+            "svdFile": "${workspaceFolder}/.vscode/STM32F411.svd", // Path to the SVD file you downloaded
+            "gdbPath": "arm-none-eabi-gdb", // Path to your arm gdb executable
+            "showDevDebugOutput": "none"
+        }
+    ]
+}

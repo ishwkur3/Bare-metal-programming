@@ -48,33 +48,44 @@ typedef struct{
 }RCC_TypeDef;
 
 typedef struct{
-    volatile uint32_t SPI_CR1;
-    volatile uint32_t SPI_CR2;
-    volatile uint32_t SPI_SR;
-    volatile uint32_t SPI_DR;
-    volatile uint32_t SPI_CRCPR;
-    volatile uint32_t SPI_RXCRCR;
-    volatile uint32_t SPI_TXCRCR;
-    volatile uint32_t SPI_I2SCFGR;
-    volatile uint32_t SPI_I2SPR;
-}SPI1_TypeDef;
+    volatile uint32_t CR1;
+    volatile uint32_t CR2;
+    volatile uint32_t SR;
+    volatile uint32_t DR;
+    volatile uint32_t CRCPR;
+    volatile uint32_t RXCRCR;
+    volatile uint32_t TXCRCR;
+    volatile uint32_t I2SCFGR;
+    volatile uint32_t I2SPR;
+}SPI_TypeDef;
+
+typedef struct{
+    volatile uint32_t SR;
+    volatile uint32_t DR;
+    volatile uint32_t BRR;
+    volatile uint32_t CR1;
+    volatile uint32_t CR2;
+    volatile uint32_t CR3;
+    volatile uint32_t GTPR;
+}USART_TypeDef;
 
 #endif
 
 #define PERIPH_BASE                                 (0X40000000UL)
 #define AHB1PERIPH_BASE                             (PERIPH_BASE + 0x00020000UL)
 #define APB2PERIPH_BASE                             (PERIPH_BASE + 0x00010000UL)
+#define APB1PERIPH_BASE                             (PERIPH_BASE)
 
 #define GPIOA_BASE                                  (AHB1PERIPH_BASE)
 #define GPIOD_BASE                                  (AHB1PERIPH_BASE + 0x0C00UL)
 #define GPIOE_BASE                                  (AHB1PERIPH_BASE + 0x1000UL)
 #define RCC_BASE                                    (AHB1PERIPH_BASE + 0x3800UL)
+#define SPI1_BASE                                   (APB2PERIPH_BASE + 0x3000UL)
+#define UART2_BASE                                  (APB1PERIPH_BASE + 0x4400UL)
 
 #define GPIOA                                       ((GPIO_TypeDef *) GPIOA_BASE)
 #define GPIOD                                       ((GPIO_TypeDef *) GPIOD_BASE)
 #define GPIOE                                       ((GPIO_TypeDef *) GPIOE_BASE)
 #define RCC                                         ((RCC_TypeDef *)  RCC_BASE)
-
-
-#define SPI1_BASE                                   (APB2PERIPH_BASE + 0x3000UL)
-#define SPI1                                        ((SPI1_TypeDef *) SPI1_BASE)
+#define SPI1                                        ((SPI_TypeDef *) SPI1_BASE)
+#define UART2                                       ((USART_TypeDef *) UART2_BASE)

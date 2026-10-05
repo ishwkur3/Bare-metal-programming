@@ -1,89 +1,163 @@
-#include <stddef.h>
 #include "gyro.h"
-#include "SPI.h"  // Pulls in your spi1_transmit, spi1_receive, and cs operations
+#include "SPI.h"
+#include "uart.h"
 
-/**
- * @brief  Writes a single byte of configuration data to a sensor register.
+/*
+ * Read one register from I3G4250D
  */
-void gyro_write_register(uint8_t reg_addr, uint8_t value)
+uint8_t i3g4250d_read_reg(uint8_t reg)
 {
-    uint8_t tx_buffer[2];
-    
-    // Format command frame: [Address byte (Write Mode)] -> [Data byte]
-    tx_buffer[0] = reg_addr; 
-    tx_buffer[1] = value;
-    
-    cs_enable();                         
-    // FIXED: Changed from spi1_transmit to the new spi1_transfer function
-    spi1_transfer(tx_buffer, NULL, 2);         
-    cs_disable();                        
-}
+    uint8_t data;
 
-
-/**
- * @brief  Reads a single configuration byte from a specific sensor register.
- */
-uint8_t gyro_read_register(uint8_t reg_addr)
-{
-    uint8_t tx_buffer[2] = { reg_addr | L3GD20_SPI_READ, 0x00 };
-    uint8_t rx_buffer[2] = { 0x00, 0x00 };
-    
+    /* Select sensor */
     cs_enable();
-    spi1_transfer(tx_buffer, rx_buffer, 2);
+
+    /*
+     * Bit 7 = 1 -> Read operation
+     */
+    spi1_transfer(reg | I3G4250D_SPI_READ);
+
+    /*
+     * Send dummy byte to generate clock
+     * and receive sensor data
+     */
+    data = spi1_transfer(0x00);
+
+    /* Deselect sensor */
     cs_disable();
-    
-    return rx_buffer[1]; // The data byte returns on the second clock cycle
+
+    return data;
 }
 
-/**
- * @brief  Initializes the gyroscope sensor over the SPI bus.
- * @retval 1 if communication succeeded, 0 if device wasn't detected.
+
+/*
+ * Write one register to I3G4250D
  */
-uint8_t gyro_init(void)
+void i3g4250d_write_reg(uint8_t reg, uint8_t value)
 {
-    // 1. Verify connection by fetching hardware identifier
-    uint8_t chip_id = gyro_read_register(L3GD20_WHO_AM_I);
-    if (chip_id != 0xD4)
+    /* Select sensor */
+    cs_enable();
+
+    /*
+     * Bit 7 = 0 -> Write operation
+     */
+    spi1_transfer(reg & 0x7F);
+
+    /* Send register value */
+    spi1_transfer(value);
+
+    /* Deselect sensor */
+    cs_disable();
+}
+
+
+/*
+ * Initialize I3G4250D
+ */
+void i3g4250d_init(void)
+{
+    uint8_t who_am_i;
+
+    /*
+     * Read sensor identification register
+     */
+    who_am_i = i3g4250d_read_reg(I3G4250D_WHO_AM_I);
+
+    uart_print("I3G4250D WHO_AM_I = 0x%02X\r\n", who_am_i);
+
+    /*
+     * Check sensor ID
+     */
+    if (who_am_i != I3G4250D_ID)
     {
-        return 0; // Device not found or SPI transmission broken
+        uart_write("I3G4250D NOT DETECTED!\r\n");
+        return;
     }
-    
-    // 2. Configure CTRL_REG1 (0x20):
-    // Bits [7:6] = 00 -> Data Rate 95Hz
-    // Bits [5:4] = 00 -> Bandwidth 12.5Hz
-    // Bit 3      = 1  -> Normal power mode (Wake up from sleep)
-    // Bits [2:0] = 111-> Enable Z, Y, X axes
-    gyro_write_register(L3GD20_CTRL_REG1, 0x0FU);
-    
-    // 3. Configure CTRL_REG4 (0x23):
-    // Bit 7      = 1  -> Block Data Update (Prevents MSB/LSB updates mid-read)
-    // Bits [5:4] = 00 -> Full scale selection: 250 dps (Degrees Per Second)
-    gyro_write_register(L3GD20_CTRL_REG4, 0x80U);
-    
-    return 1; // Initialization successful
+
+    uart_write("I3G4250D detected successfully.\r\n");
+
+
+    /*
+     * CTRL_REG1 = 0x0F
+     *
+     * PD  = 1 -> Normal mode
+     * XEN = 1 -> X-axis enabled
+     * YEN = 1 -> Y-axis enabled
+     * ZEN = 1 -> Z-axis enabled
+     *
+     * DR/BW = default configuration
+     */
+    i3g4250d_write_reg(I3G4250D_CTRL_REG1, 0x0F);
+
+
+    /*
+     * CTRL_REG4
+     *
+     * FS bits select full-scale range.
+     *
+     * 00 -> ±245 dps
+     *
+     * Default value 0x00 gives ±245 dps.
+     */
+    i3g4250d_write_reg(I3G4250D_CTRL_REG4, 0x00);
+
+    uart_write("I3G4250D configuration complete.\r\n");
 }
 
-/**
- * @brief  Reads raw 3-axis angular velocity measurements in a single burst step.
- */
-void gyro_read_data(Gyro_Data_t *data)
-{
-    uint8_t start_cmd = L3GD20_OUT_X_L | L3GD20_SPI_READ | L3GD20_SPI_AUTO_INC;
-    
-    // Allocate 7 bytes: 1 for command byte + 6 for output registers
-    uint8_t tx_buffer[7] = {0};
-    uint8_t rx_buffer[7] = {0};
-    
-    tx_buffer[0] = start_cmd;
-    
-    cs_enable();
-    // Double check that it is lowercase "spi1_transfer", NOT "SPI1_transfer"
-    spi1_transfer(tx_buffer, NULL, 2); 
 
+/*
+ * Read X, Y and Z axis data
+ */
+void i3g4250d_read_xyz(int16_t *x, int16_t *y, int16_t *z)
+{
+    uint8_t buffer[6];
+
+    /*
+     * Select sensor
+     */
+    cs_enable();
+
+    /*
+     * Read operation + auto increment
+     *
+     * Starting register:
+     * OUT_X_L = 0x28
+     *
+     * 0x80 -> read
+     * 0x40 -> auto increment
+     *
+     * Command = 0xE8
+     */
+    spi1_transfer(I3G4250D_OUT_X_L |
+                  I3G4250D_SPI_READ |
+                  I3G4250D_SPI_AUTOINC);
+
+    /*
+     * Read six consecutive bytes:
+     *
+     * buffer[0] = X Low
+     * buffer[1] = X High
+     * buffer[2] = Y Low
+     * buffer[3] = Y High
+     * buffer[4] = Z Low
+     * buffer[5] = Z High
+     */
+    for (uint8_t i = 0; i < 6; i++)
+    {
+        buffer[i] = spi1_transfer(0x00);
+    }
+
+    /*
+     * Deselect sensor
+     */
     cs_disable();
-    
-    // Index 0 contains junk from command byte phase. Indices 1-6 contain data.
-    data->x = (int16_t)((rx_buffer[2] << 8) | rx_buffer[1]);
-    data->y = (int16_t)((rx_buffer[4] << 8) | rx_buffer[3]);
-    data->z = (int16_t)((rx_buffer[6] << 8) | rx_buffer[5]);
+
+    /*
+     * Combine low and high bytes
+     */
+    *x = (int16_t)((buffer[1] << 8) | buffer[0]);
+
+    *y = (int16_t)((buffer[3] << 8) | buffer[2]);
+
+    *z = (int16_t)((buffer[5] << 8) | buffer[4]);
 }

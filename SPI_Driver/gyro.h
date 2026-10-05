@@ -1,32 +1,38 @@
-#ifndef GYRO_H
-#define GYRO_H
+#ifndef I3G4250D_H
+#define I3G4250D_H
 
 #include <stdint.h>
 
-// --- L3GD20 Internal Register Map ---
-#define L3GD20_WHO_AM_I         0x0F  // Device ID Register (Should return 0xD4)
-#define L3GD20_CTRL_REG1        0x20  // Power mode, Data rate, Axis enable
-#define L3GD20_CTRL_REG4        0x23  // Full-scale selection, Block data update
-#define L3GD20_OUT_X_L          0x28  // Output Data registers
-#define L3GD20_OUT_X_H          0x29
-#define L3GD20_OUT_Y_L          0x2A
-#define L3GD20_OUT_Y_H          0x2B
-#define L3GD20_OUT_Z_L          0x2C
-#define L3GD20_OUT_Z_H          0x2D
+/* I3G4250D Register Addresses */
+#define I3G4250D_WHO_AM_I      0x0F
 
-// --- SPI Communication Protocol Flags ---
-#define L3GD20_SPI_READ         (1U << 7) // Bit 7: Read (1) or Write (0) flag
-#define L3GD20_SPI_AUTO_INC     (1U << 6) // Bit 6: Address Auto-Increment flag
+#define I3G4250D_CTRL_REG1     0x20
+#define I3G4250D_CTRL_REG2     0x21
+#define I3G4250D_CTRL_REG3     0x22
+#define I3G4250D_CTRL_REG4     0x23
+#define I3G4250D_CTRL_REG5     0x24
 
-// --- Data Structure for Gyro Readings ---
-typedef struct {
-    int16_t x; // Raw X-axis angular velocity
-    int16_t y; // Raw Y-axis angular velocity
-    int16_t z; // Raw Z-axis angular velocity
-} Gyro_Data_t;
+#define I3G4250D_OUT_X_L       0x28
+#define I3G4250D_OUT_X_H       0x29
 
-// --- Public Function Prototypes ---
-uint8_t gyro_init(void);
-void gyro_read_data(Gyro_Data_t *data);
+#define I3G4250D_OUT_Y_L       0x2A
+#define I3G4250D_OUT_Y_H       0x2B
+
+#define I3G4250D_OUT_Z_L       0x2C
+#define I3G4250D_OUT_Z_H       0x2D
+
+/* SPI read/write bits */
+#define I3G4250D_SPI_READ      0x80
+#define I3G4250D_SPI_AUTOINC   0x40
+
+/* Expected WHO_AM_I value */
+#define I3G4250D_ID            0xD3
+
+void i3g4250d_init(void);
+
+uint8_t i3g4250d_read_reg(uint8_t reg);
+void i3g4250d_write_reg(uint8_t reg, uint8_t value);
+
+void i3g4250d_read_xyz(int16_t *x, int16_t *y, int16_t *z);
 
 #endif

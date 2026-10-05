@@ -1,11 +1,11 @@
 cc = arm-none-eabi-gcc
 
 CFLAGS = -c -mcpu=cortex-m4 -mthumb -std=gnu11 -g
-LDFLAGS = -nostdlib -T stm32_ls.ld *.o -o Bare_Metal_Program.elf -Wl,-Map=Bare_Metal_Program.map
+LDFLAGS = -nostdlib -specs=nano.specs -lc -lm -T stm32_ls.ld *.o -o Bare_Metal_Program.elf -Wl,-Map=Bare_Metal_Program.map
 
 all: Bare_Metal_Program.elf
 
-main.o: main.c SPI.h GPIO.h gyro.h
+main.o: main.c uart.h GPIO.h SPI.h gyro.h
 	$(cc) ${CFLAGS} $< -o $@
 
 stm32f411_startup.o: stm32f411_startup.c
@@ -14,13 +14,16 @@ stm32f411_startup.o: stm32f411_startup.c
 GPIO.o: GPIO.c GPIO.h
 	$(cc) ${CFLAGS} $< -o $@
 
-SPI.o: SPI.c SPI.h
+uart.o: uart.c uart.h
+	$(cc) ${CFLAGS} $< -o $@
+
+SPI.o: SPI.c SPI.h uart.h
 	$(cc) ${CFLAGS} $< -o $@
 
 gyro.o: gyro.c gyro.h
 	$(cc) ${CFLAGS} $< -o $@
 
-Bare_Metal_Program.elf: main.o SPI.o GPIO.o gyro.o stm32f411_startup.o 
+Bare_Metal_Program.elf: main.o GPIO.o uart.o SPI.o gyro.o stm32f411_startup.o 
 	$(cc) $(LDFLAGS)
 
 load:
